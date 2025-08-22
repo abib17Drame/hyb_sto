@@ -9,23 +9,10 @@ import 'package:hybrid_storage_app/core/services/communication_service.dart';
 import 'package:file_picker/file_picker.dart' as picker;
 import 'dart:io';
 
-// Fonction utilitaire pour récupérer tous les fichiers d'un dossier
-Future<List<File>> _getAllFilesFromDirectory(String directoryPath) async {
-  final List<File> files = [];
-  final directory = Directory(directoryPath);
-  
-  try {
-    await for (final entity in directory.list(recursive: true)) {
-      if (entity is File) {
-        files.add(entity);
-      }
-    }
-  } catch (e) {
-    print('Erreur lors de la lecture du dossier: $e');
-  }
-  
-  return files;
-}
+
+
+
+
 
 // Écran des transferts, maintenant connecté au TransferBloc global.
 class TransfersScreen extends StatelessWidget {
@@ -101,9 +88,9 @@ class TransfersView extends StatelessWidget {
           },
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => _showUploadOptions(context),
+          onPressed: () => _selectAndUploadFile(context),
           child: const Icon(Icons.upload),
-          tooltip: 'Envoyer un fichier vers l\'ordinateur',
+          tooltip: 'Envoyer des fichiers vers l\'ordinateur',
         ),
       ),
     );
@@ -112,75 +99,54 @@ class TransfersView extends StatelessWidget {
   Future<void> _selectAndUploadFile(BuildContext context) async {
     try {
       final result = await picker.FilePicker.platform.pickFiles(
-        allowMultiple: false,
+        allowMultiple: true, // Permettre la sélection multiple
         type: picker.FileType.any,
       );
 
       if (result != null && result.files.isNotEmpty) {
-        final file = File(result.files.first.path!);
-        final fileName = result.files.first.name;
-        
-        // Créer un FileInfo pour le fichier sélectionné
-        final fileInfo = app_models.FileInfo(
-          name: fileName,
-          path: file.path,
-          sizeInBytes: await file.length(),
-          type: app_models.FileType.file,
-          modifiedAt: DateTime.now(),
-          isLocal: true, // Le fichier est sur le smartphone
-        );
-
-        // Choisir le dossier de destination
+        // Choisir le dossier de destination une seule fois pour tous les fichiers
         final destinationPath = await _showDestinationPicker(context);
         if (destinationPath != null) {
-          // Démarrer l'upload
-          context.read<TransferBloc>().add(StartUpload(fileInfo, destinationPath));
-        }
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la sélection du fichier: $e')),
-      );
-    }
-  }
+          // Traiter chaque fichier sélectionné
+          for (final pickedFile in result.files) {
+            if (pickedFile.path != null) {
+              final file = File(pickedFile.path!);
+              final fileName = pickedFile.name;
+              
+              // Créer un FileInfo pour chaque fichier sélectionné
+              final fileInfo = app_models.FileInfo(
+                name: fileName,
+                path: file.path,
+                sizeInBytes: await file.length(),
+                type: app_models.FileType.file,
+                modifiedAt: DateTime.now(),
+                isLocal: true, // Le fichier est sur le smartphone
+              );
 
-  Future<void> _selectAndUploadFolder(BuildContext context) async {
-    try {
-      final result = await picker.FilePicker.platform.getDirectoryPath();
-
-      if (result != null) {
-        final directory = Directory(result);
-        final files = await _getAllFilesFromDirectory(result);
-        
-        if (files.isNotEmpty) {
-          // Créer un FileInfo pour le dossier sélectionné
-          final fileInfo = app_models.FileInfo(
-            name: directory.path.split('/').last,
-            path: directory.path,
-            sizeInBytes: 0, // Taille calculée à partir des fichiers
-            type: app_models.FileType.directory,
-            modifiedAt: DateTime.now(),
-            isLocal: true, // Le dossier est sur le smartphone
-          );
-
-          // Choisir le dossier de destination
-          final destinationPath = await _showDestinationPicker(context);
-          if (destinationPath != null) {
-            // Démarrer l'upload
-            context.read<TransferBloc>().add(StartUpload(fileInfo, destinationPath));
+              // Démarrer l'upload pour chaque fichier
+              context.read<TransferBloc>().add(StartUpload(fileInfo, destinationPath));
+            }
           }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Le dossier sélectionné est vide')),
-          );
+          
+          // Afficher un message de confirmation
+          if (result.files.length > 1) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${result.files.length} fichiers ajoutés au transfert'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
         }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la sélection du dossier: $e')),
+        SnackBar(content: Text('Erreur lors de la sélection des fichiers: $e')),
       );
     }
   }
+
+
 
   Future<String?> _showDestinationPicker(BuildContext context) async {
     return showDialog<String>(
@@ -189,33 +155,7 @@ class TransfersView extends StatelessWidget {
     );
   }
 
-  void _showUploadOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (modalContext) {
-        return Wrap(
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.file_upload),
-              title: const Text('Envoyer un fichier'),
-              onTap: () {
-                Navigator.pop(modalContext);
-                _selectAndUploadFile(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.folder_open),
-              title: const Text('Envoyer un dossier'),
-              onTap: () {
-                Navigator.pop(modalContext);
-                _selectAndUploadFolder(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   Widget _buildTransferList(List<Transfer> transfers) {
     if (transfers.isEmpty) {

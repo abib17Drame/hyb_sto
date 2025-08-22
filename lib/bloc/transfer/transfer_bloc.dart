@@ -53,16 +53,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     } else {
       // Upload - utiliser le vrai fichier depuis le FileInfo
       if (transfer.file.isLocal) {
-        if (transfer.file.type == app_models.FileType.directory) {
-          // Pour les dossiers, récupérer tous les fichiers et utiliser uploadFolder
-          _uploadDirectory(transfer, emit);
-          return; // On sort car on gère l'upload de dossier séparément
-        } else {
-          // Pour les fichiers individuels
-          final file = File(transfer.file.path);
-          final remotePath = transfer.remoteDestinationPath ?? '/';
-          progressStream = _communicationService.uploadFile(file, remotePath);
-        }
+        // Pour les fichiers individuels
+        final file = File(transfer.file.path);
+        final remotePath = transfer.remoteDestinationPath ?? '/';
+        progressStream = _communicationService.uploadFile(file, remotePath);
       } else {
         progressStream = _communicationService.uploadFile(null, transfer.file.path);
       }
@@ -83,52 +77,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     _subscriptions.add(subscription);
   }
 
-  // Méthode pour s'assurer que le dossier de destination existe
-  Future<void> _ensureDestinationDirectory(String path) async {
-    try {
-      // Envoyer une commande pour créer le dossier s'il n'existe pas
-      await _communicationService.sendCommand('create_directory', {'path': path});
-    } catch (e) {
-      // Ignorer les erreurs, le serveur gérera la création automatiquement
-      print('Impossible de créer le dossier de destination: $e');
-    }
-  }
 
-  void _uploadDirectory(Transfer transfer, Emitter<TransferState> emit) async {
-    try {
-      final directory = Directory(transfer.file.path);
-      final files = <File>[];
-      
-      await for (final entity in directory.list(recursive: true)) {
-        if (entity is File) {
-          files.add(entity);
-        }
-      }
-      
-      if (files.isNotEmpty) {
-        final remotePath = transfer.remoteDestinationPath ?? '/';
-        final progressStream = _communicationService.uploadFolder(files, remotePath);
-        
-        final subscription = progressStream.listen(
-          (progress) {
-            if (!isClosed) add(UpdateTransferProgress(transfer.id, progress));
-          },
-          onDone: () {
-            if (!isClosed) add(CompleteTransfer(transfer.id));
-          },
-          onError: (error) {
-            if (!isClosed) add(FailTransfer(transfer.id, error.toString()));
-          },
-        );
-        _subscriptions.add(subscription);
-      } else {
-        // Dossier vide
-        add(CompleteTransfer(transfer.id));
-      }
-    } catch (e) {
-      add(FailTransfer(transfer.id, e.toString()));
-    }
-  }
 
   void _onUpdateProgress(
     UpdateTransferProgress event,

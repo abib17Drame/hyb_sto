@@ -8,10 +8,14 @@ import 'package:hybrid_storage_app/core/services/background_service.dart';
 import 'package:hybrid_storage_app/ui/screens/onboarding/welcome_screen.dart';
 import 'package:hybrid_storage_app/core/di/service_locator.dart';
 
+
+
+
 // Point d'entrée de l'application.
 void main() async { // main est maintenant async
   // Assure que les bindings Flutter sont initialisés avant toute opération asynchrone.
   WidgetsFlutterBinding.ensureInitialized();
+  
   // Configure le localisateur de services pour l'injection de dépendances.
   setupLocator();
   // Initialise le service de background (BackgroundFetch)
