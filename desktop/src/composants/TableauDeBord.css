@@ -1,0 +1,96 @@
+.tableau-de-bord h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.grille-widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.widget.carte {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.widget.carte:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.widget h3 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #34495e;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+/* Styles pour le widget de stockage */
+.barre-progression-conteneur {
+  background-color: #ecf0f1;
+  border-radius: 10px;
+  height: 20px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.barre-progression {
+  background-color: #3498db;
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+.widget p {
+  margin-top: 10px;
+  color: #7f8c8d;
+}
+
+/* Styles pour les listes dans les widgets */
+.widget ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.widget li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f7f7f7;
+  color: #555;
+}
+
+.widget li:last-child {
+  border-bottom: none;
+}
+
+/* Styles pour le statut des appareils */
+.widget li span {
+  font-weight: bold;
+}
+
+.statut-connecté span {
+  color: #27ae60; /* Vert */
+}
+
+.statut-en.veille span, .statut-en-veille span {
+  color: #f39c12; /* Orange */
+}
+
+.statut-déconnecté span {
+  color: #c0392b; /* Rouge */
+}
+
+/* Styles pour le journal d'activité */
+.widget li span[class*="heure"] {
+  color: #95a5a6;
+  margin-right: 10px;
+}

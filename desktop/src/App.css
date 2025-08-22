@@ -1,0 +1,79 @@
+/* Styles globaux pour l'application */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Conteneur principal de l'application utilisant Flexbox */
+.app-conteneur {
+  display: flex;
+  height: 100vh; /* Pleine hauteur de la vue */
+  width: 100vw; /* Pleine largeur de la vue */
+  overflow: hidden; /* Empêche le défilement au niveau de la page principale */
+}
+
+/* Barre latérale de navigation */
+.barre-laterale {
+  width: 240px;
+  background-color: var(--sidebar-bg); /* Un bleu foncé/gris pour un look professionnel */
+  color: var(--text);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Empêche la barre de rétrécir */
+}
+
+.logo-conteneur {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo-conteneur h2 {
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+}
+
+.barre-laterale ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.barre-laterale li {
+  margin-bottom: 10px;
+}
+
+.barre-laterale a {
+  color: var(--sidebar-link); /* Gris clair pour les liens */
+  text-decoration: none;
+  display: block;
+  padding: 12px 15px;
+  border-radius: 6px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.barre-laterale a:hover {
+  background-color: var(--sidebar-hover); /* Un bleu un peu plus clair au survol */
+  color: var(--text);
+}
+
+/* Style pour le lien de la page active */
+.barre-laterale li.actif a {
+  background-color: var(--active-bg); /* Bleu vif pour l'élément actif */
+  color: var(--text);
+  font-weight: bold;
+}
+
+/* Contenu principal de la page */
+.contenu-principal {
+  flex-grow: 1; /* Prend tout l'espace restant */
+  padding: 30px;
+  overflow-y: auto; /* Ajoute une barre de défilement si le contenu dépasse */
+}

@@ -1,0 +1,101 @@
+.ecran-parametres {
+  max-width: 800px;
+}
+
+.ecran-parametres h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+
+.section-parametres {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.section-parametres h2 {
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #34495e;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+.champ-parametre {
+  margin-bottom: 20px;
+}
+
+.champ-parametre label,
+.champ-parametre-checkbox label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+
+.champ-parametre input[type="text"],
+.champ-parametre input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  box-sizing: border-box; /* Important pour que le padding ne change pas la largeur */
+}
+
+.champ-avec-bouton {
+  display: flex;
+}
+
+.champ-avec-bouton input {
+  flex-grow: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.champ-avec-bouton button {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.champ-parametre-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.champ-parametre-checkbox input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+}
+
+.actions-globales {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.bouton-sauvegarder {
+  padding: 12px 25px;
+  background-color: #27ae60; /* Vert */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.bouton-sauvegarder:hover {
+  background-color: #229954;
+}

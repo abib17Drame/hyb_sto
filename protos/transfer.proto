@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package transfer;
+
+// Le service de transfert de fichiers.
+service FileTransfer {
+  // Un stream client pour l'upload de fichiers.
+  // Le client envoie des morceaux de fichier, le serveur répond une seule fois.
+  rpc UploadFile (stream Chunk) returns (UploadStatus);
+
+  // Un stream serveur pour le download de fichiers.
+  // Le client envoie une requête, le serveur répond avec des morceaux de fichier.
+  rpc DownloadFile (DownloadRequest) returns (stream Chunk);
+}
+
+// Message contenant un morceau (chunk) de fichier.
+message Chunk {
+  // Les données brutes du morceau.
+  bytes content = 1;
+}
+
+// Le statut de l'upload, retourné par le serveur.
+message UploadStatus {
+  bool success = 1;
+  string message = 2;
+}
+
+// La requête pour télécharger un fichier.
+message DownloadRequest {
+  // Le chemin du fichier à télécharger sur le serveur.
+  string remote_file_path = 1;
+}
