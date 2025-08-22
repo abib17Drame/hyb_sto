@@ -275,6 +275,11 @@ def ouvrir_fichier(payload: dict | None = None, chemin: str | None = Query(defau
         print(f"[ERREUR] lors de l'ouverture: {e}")
         return {"statut": "erreur", "message": str(e)}
 
+@application_fastapi.post("/api/v1/fichiers/open_file")
+def open_file_alias(payload: dict | None = None, chemin: str | None = Query(default=None)):
+    """Alias anglais pour compatibilité mobile; délègue à ouvrir_fichier."""
+    return ouvrir_fichier(payload=payload, chemin=chemin)
+
 @application_fastapi.post("/api/v1/fichiers/upload")
 async def upload_fichier(file: UploadFile, chemin_destination: str = Form(default="/")):
     base_dir = parametres_db.get("stockage", {}).get("dossier_principal", REPERTOIRE_DE_BASE_DEFAUT)
