@@ -66,32 +66,49 @@ class _PairingScreenState extends State<PairingScreen> {
     await controller.stop();
 
     try {
+      print('[APPARIAGE] QR Code détecté: $raw');
+      
       final decodedQr = jsonDecode(raw);
-        final String nomHote = decodedQr['nom_hote'];
-        final String clePubliqueServeurPem = decodedQr['cle_publique_pem'];
-        // Nouvelles infos envoyées par le QR
-        final String ip = decodedQr['ip'] ?? '127.0.0.1';
-        final int apiPort = (decodedQr['api_port'] ?? 8001) as int;
-        final int grpcPort = (decodedQr['grpc_port'] ?? 50051) as int;
+      print('[APPARIAGE] QR Code décodé: $decodedQr');
+      
+      final String nomHote = decodedQr['nom_hote'];
+      final String clePubliqueServeurPem = decodedQr['cle_publique_pem'];
+      // Nouvelles infos envoyées par le QR
+      final String ip = decodedQr['ip'] ?? '127.0.0.1';
+      final int apiPort = (decodedQr['api_port'] ?? 8001) as int;
+      final int grpcPort = (decodedQr['grpc_port'] ?? 50051) as int;
 
-        // 1. Générer la paire de clés pour ce mobile
-        final cryptoService = getIt<CryptoService>();
-        final paireDeClesMobile = cryptoService.genererPaireDeClesRSA();
-        final clePubliqueMobilePem = cryptoService.encoderClePubliqueEnPem(paireDeClesMobile.clePublique);
+      print('[APPARIAGE] Configuration serveur: IP=$ip, API_PORT=$apiPort, GRPC_PORT=$grpcPort');
 
-        // 2. Préparer les données à envoyer au serveur
-        final donneesAppareil = {
-          "id_appareil": const Uuid().v4(), // Génère un ID unique pour ce mobile
-          "nom_appareil": "Mon Appareil Mobile", // TODO: Rendre ce nom configurable
-          "cle_publique_pem": clePubliqueMobilePem,
-        };
+      // 1. Générer la paire de clés pour ce mobile
+      print('[APPARIAGE] Génération des clés cryptographiques...');
+      final cryptoService = getIt<CryptoService>();
+      final paireDeClesMobile = cryptoService.genererPaireDeClesRSA();
+      print('[APPARIAGE] Clés générées avec succès');
+      
+      final clePubliqueMobilePem = cryptoService.encoderClePubliqueEnPem(paireDeClesMobile.clePublique);
+      print('[APPARIAGE] Clé publique encodée en PEM: ${clePubliqueMobilePem.substring(0, 50)}...');
 
-        // 3. Envoyer les données au serveur pour compléter l'appairage
-        final communicationService = getIt<CommunicationService>() as RealCommunicationService;
-        communicationService.configureServer(host: ip, apiPort: apiPort, grpcPort: grpcPort);
-        final success = await communicationService.completerAppairage(ip, donneesAppareil);
+      // 2. Préparer les données à envoyer au serveur
+      final donneesAppareil = {
+        "id_appareil": const Uuid().v4(), // Génère un ID unique pour ce mobile
+        "nom_appareil": "Mon Appareil Mobile", // TODO: Rendre ce nom configurable
+        "cle_publique_pem": clePubliqueMobilePem,
+      };
+      
+      print('[APPARIAGE] Données d\'appairage préparées: ${donneesAppareil['id_appareil']}');
 
-        if (success && mounted) {
+      // 3. Envoyer les données au serveur pour compléter l'appairage
+      print('[APPARIAGE] Configuration du service de communication...');
+      final communicationService = getIt<CommunicationService>() as RealCommunicationService;
+      communicationService.configureServer(host: ip, apiPort: apiPort, grpcPort: grpcPort);
+      
+      print('[APPARIAGE] Tentative d\'appairage avec le serveur...');
+      final success = await communicationService.completerAppairage(ip, donneesAppareil);
+      
+      print('[APPARIAGE] Résultat de l\'appairage: $success');
+
+      if (success && mounted) {
           // 4. Vérifier que l'appareil est bien enregistré côté serveur
           await Future.delayed(const Duration(seconds: 2)); // Attendre un peu
           

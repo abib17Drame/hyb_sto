@@ -342,14 +342,33 @@ class RealCommunicationService implements CommunicationService {
 
   Future<bool> completerAppairage(String host, Map<String, dynamic> donneesAppareil) async {
     final url = Uri.parse('http://$host:$_apiPort/api/v1/appairage/completer');
+    print('[APPARIAGE] URL de l\'endpoint: $url');
+    print('[APPARIAGE] Port API configuré: $_apiPort');
+    print('[APPARIAGE] Données à envoyer: ${jsonEncode(donneesAppareil)}');
+    
     try {
+      print('[APPARIAGE] Envoi de la requête POST...');
       final reponse = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(donneesAppareil),
       );
-      return reponse.statusCode == 200;
+      
+      print('[APPARIAGE] Réponse reçue: Status=${reponse.statusCode}, Body=${reponse.body}');
+      
+      if (reponse.statusCode == 200) {
+        print('[APPARIAGE] Appairage réussi côté serveur');
+        return true;
+      } else {
+        print('[APPARIAGE] Erreur serveur: ${reponse.statusCode} - ${reponse.body}');
+        return false;
+      }
     } catch (e) {
+      print('[APPARIAGE] Exception lors de l\'appairage: $e');
+      print('[APPARIAGE] Type d\'erreur: ${e.runtimeType}');
+      if (e is SocketException) {
+        print('[APPARIAGE] Erreur de socket: ${e.message}');
+      }
       return false;
     }
   }
